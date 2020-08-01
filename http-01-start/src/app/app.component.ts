@@ -1,35 +1,64 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
+import { PostService } from './post.service';
+import { Post } from './post.module';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  loadedPosts = [];
+export class AppComponent implements OnInit,OnDestroy {
+  loadedPosts: Post[] = [];
+  isFetching = false;
+  error = null;
+  private errorSub: Subscription;
+  constructor(private http: HttpClient,
+            private postService: PostService) {}
 
-  constructor(private http: HttpClient) {}
+  ngOnInit() {
+    this.errorSub = this.postService.error.subscribe(errorMessage => {
+      this.error = errorMessage;
+    })
+    this.isFetching = true;
+    this.postService.fetchposts().subscribe(posts => {
+      this.isFetching = false;
+      this.loadedPosts = posts;
+    }, error => {
+      this.isFetching = false;
+      this.error = error.statusText;
+    });
+  }
 
-  ngOnInit() {}
-
-  onCreatePost(postData: { title: string; content: string }) {
+  onCreatePost(postData: Post) {
     // Send Http request
-    this.http
-      .post(
-        'https://ng-complete-guide-c56d3.firebaseio.com/posts.json',
-        postData
-      )
-      .subscribe(responseData => {
-        console.log(responseData);
-      });
+    this.postService.createAnsStorePost(postData);
   }
 
   onFetchPosts() {
     // Send Http request
+    this.isFetching = true;
+    this.postService.fetchposts().subscribe(posts => {
+      this.isFetching = false;
+      this.loadedPosts = posts;
+    }, error => {
+      this.isFetching = false;
+      this.error = error.message;
+    });
   }
 
   onClearPosts() {
     // Send Http request
+    this.postService.deletePost().subscribe(() => {
+      this.loadedPosts = [];
+    });
+  }
+  onhandleError() {
+    this.error = null;
+  }
+  ngOnDestroy() {
+    this.errorSub.unsubscribe();
   }
 }
