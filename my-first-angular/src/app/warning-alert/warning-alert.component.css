@@ -1,0 +1,15 @@
+h2 {
+    padding: 20px;
+    background-color: mistyrose;
+    border: 1px solid red;
+}
+.danger{
+    animation:blinkingText 1.2s infinite;
+}
+@keyframes blinkingText{
+    0%{     color: indianred;    }
+    49%{    color: tomato; }
+    60%{    color: transparent; }
+    99%{    color:transparent;  }
+    100%{   color: red;    }
+}

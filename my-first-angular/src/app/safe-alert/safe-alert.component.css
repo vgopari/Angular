@@ -1,0 +1,16 @@
+h2 {
+    padding: 20px;
+    background-color: rgb(133, 236, 226);
+    border: 1px solid green;
+}
+
+.safe{
+    animation:blinking 1.2s infinite;
+}
+@keyframes blinking{
+    0%{     color: greenyellow;    }
+    49%{    color: green; }
+    60%{    color: transparent; }
+    99%{    color:transparent;  }
+    100%{   color: green;    }
+}
